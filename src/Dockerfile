@@ -1,20 +1,27 @@
-FROM golang:1.24-alpine  AS build
-RUN apk add --no-cache git
+FROM golang:1.25-alpine AS builder
 
-WORKDIR /src
+# Set working directory
+WORKDIR /app
+
+# Copy go mod and sum, then download dependencies
 COPY go.mod go.sum ./
-RUN go mod download
+RUN go mod tidy
 
+# Copy all source code
 COPY . .
-# disable cgo, target linux, static link
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-    go build -ldflags="-s -w" -o server .
 
-FROM alpine:latest
-RUN apk add --no-cache ca-certificates
+# ✅ Build Linux amd64 binary (for ECS)
+RUN GOOS=linux GOARCH=amd64 go build -o main .
+
+# Second, minimal runtime image
+FROM alpine:3.19
 
 WORKDIR /app
-COPY --from=build /src/server .
+COPY --from=builder /app/main .
+
+# Ensure binary is executable
+RUN chmod +x main
 
 EXPOSE 8080
-ENTRYPOINT ["./server"]
+CMD ["./main"]
+

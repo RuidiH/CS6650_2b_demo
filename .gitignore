@@ -1,4 +1,36 @@
-**.tfvars
-**.tfstate
-**.tfstate.*
-**/.terraform/
+# ===== Terraform =====
+.terraform/
+terraform.tfstate
+terraform.tfstate.*
+*.tfvars
+*.tfplan
+.terraform.lock.hcl
+
+# ===== AWS Credentials =====
+*.pem
+*.key
+*.env
+.aws/
+credentials/
+config/
+
+# ===== Go Binaries =====
+main
+*.exe
+*.out
+
+# ===== Docker / Build Cache =====
+*.log
+*.tmp
+docker-compose.override.yml
+
+# ===== IDE / System Files =====
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# ===== Misc =====
+*.zip
+*.tar
+*.gz
