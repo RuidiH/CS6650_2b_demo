@@ -1,3 +1,12 @@
+# Distributed System – Product API
+
+This project deploys a simple **Go-based REST API** to AWS ECS using **Terraform** and **Docker**.  
+The service exposes endpoints to retrieve and manage product data.
+
+These instructions explain exactly how to deploy and test the system on **any machine**.
+
+
+
 ## Instructions
 
 ### Prepare Credentials
@@ -17,6 +26,24 @@ aws configure set aws_session_token <YOUR-TEMP-SESSION-TOKEBN>
 ```
 cd terraform
 terraform init
+terraform apply -auto-approve
+```
+
+Once complete, Terraform will output:
+ecs_cluster_name
+ecs_service_name
+
+### Step 3: Build and Push Docker Image
+```
+cd src
+docker buildx build --platform linux/amd64 \
+  -t <YOUR_ECR_REPO_URI>:latest \
+  --push .
+```
+
+Then redeploy by re-running:
+```
+cd ../terraform
 terraform apply -auto-approve
 ```
 
@@ -42,10 +69,11 @@ aws ec2 describe-network-interfaces \
 --output text
 ```
 
-Send some requests:
+### Test API Endpoints
 ```
-curl http://<PUBLIC-IP-ADDRESS>:8080/albums
+curl http://<PUBLIC-IP-ADDRESS>:8080/products
 ```
+
 
 ## Clean Up
 ```
